@@ -1,16 +1,13 @@
 {
   "name": "token-launcher",
   "private": true,
-  "workspaces": [
-    "contracts"
-  ],
   "version": "0.1.0",
   "type": "module",
   "packageManager": "yarn@4.9.1",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint . --ext .ts,.tsx --max-warnings=0  --ignore-pattern contracts",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
     "preview": "vite preview"
   },
   "dependencies": {
