@@ -1,35 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+import {ConnectButton, RainbowKitProvider} from "@rainbow-me/rainbowkit";
+import {WagmiProvider} from "wagmi";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {createAppKit} from "@reown/appkit/react";
+import {WagmiAdapter} from "@reown/appkit-adapter-wagmi";
+import {arbitrum, hardhat, mainnet, sepolia} from "viem/chains";
+import '@rainbow-me/rainbowkit/styles.css';
+import {TokenCreator} from "./components/TokenCreator.tsx";
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+// 0. Setup queryClient
+const queryClient = new QueryClient()
+
+// 1. Get projectId from https://cloud.reown.com
+const projectId = '7d7c73d1eccfd900722e5281f12e4222'
+
+// 2. Create a metadata object - optional
+const metadata = {
+    name: 'TokenLauncher',
+    description: 'AppKit Example',
+    url: 'http://localhost:5173', // origin must match your domain & subdomain
+    icons: ['https://assets.reown.com/reown-profile-pic.png']
+}
+
+// 3. Set the networks
+const networks = [hardhat, sepolia]
+
+// 4. Create Wagmi Adapter
+const wagmiAdapter = new WagmiAdapter({
+    networks: [...networks],
+    projectId,
+    ssr: true,
+    autoConnect: true,
+});
+
+// 5. Create modal
+createAppKit({
+    adapters: [wagmiAdapter],
+    networks,
+    projectId,
+    metadata,
+    features: {
+        analytics: true // Optional - defaults to your Cloud configuration
+    }
+})
+
+
+function App() {
+    return (
+        <WagmiProvider config={wagmiAdapter.wagmiConfig}>
+            <QueryClientProvider client={queryClient}>
+                <RainbowKitProvider>
+                    <ConnectButton
+                        chainStatus="icon"
+                        showBalance={false}
+                        accountStatus="address"
+                    />
+                    <TokenCreator/>
+                </RainbowKitProvider>
+            </QueryClientProvider>
+        </WagmiProvider>
+    )
 }
 
 export default App
